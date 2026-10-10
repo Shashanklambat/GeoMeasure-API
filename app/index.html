@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geospatial File Measurement API</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #19221c;
+            background: #f7f9f7;
+        }
+        .container {
+            max-width: 1150px;
+            margin: 45px auto;
+            padding: 0 22px;
+        }
+        h1 { margin-bottom: 10px; }
+        h2 { margin-top: 0; font-size: 19px; }
+        .subtitle { color: #5a665d; margin-bottom: 28px; }
+        .upload-box, .panel {
+            background: white;
+            border: 1px solid #dde6dd;
+            border-radius: 10px;
+            padding: 24px;
+        }
+        .upload-box { margin-bottom: 24px; }
+        form { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+        input[type="file"] { max-width: 100%; font-size: 15px; }
+        button {
+            background: #15803d;
+            color: white;
+            border: 0;
+            border-radius: 6px;
+            padding: 11px 20px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        button:hover { background: #166534; }
+        button:disabled { opacity: .6; cursor: wait; }
+        .hint { font-size: 13px; color: #667269; margin-top: 12px; }
+        #message { min-height: 20px; margin-bottom: 0; }
+        .success { color: #166534; }
+        .error { color: #b91c1c; }
+        .results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        pre {
+            margin-bottom: 0;
+            padding: 16px;
+            min-height: 280px;
+            max-height: 520px;
+            overflow: auto;
+            background: #f7f9f7;
+            border: 1px solid #e5ebe5;
+            border-radius: 6px;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+        a { color: #166534; }
+        @media (max-width: 750px) {
+            .container { margin-top: 24px; }
+            .results { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Geospatial File Measurement</h1>
+        <p class="subtitle">Upload a KML file or a ZIP containing a Shapefile to see its details and measurements.</p>
+
+        <div class="upload-box">
+            <form id="uploadForm">
+                <input id="fileInput" type="file" accept=".kml,.zip" aria-label="Choose a KML or Shapefile ZIP" required>
+                <button id="uploadButton" type="submit">Upload and Measure</button>
+            </form>
+            <p class="hint">Maximum file size: 10 MB. No account or database needed.</p>
+            <p id="message" role="status" aria-live="polite"></p>
+        </div>
+
+        <div class="results">
+            <section class="panel">
+                <h2>File Information</h2>
+                <pre id="fileInfo">Upload a file to see its information.</pre>
+            </section>
+            <section class="panel">
+                <h2>Feature Measurements</h2>
+                <pre id="measurements">Upload a file to see its measurements.</pre>
+            </section>
+        </div>
+        <p class="hint">Results are stored temporarily while the server runs. <a href="/docs">View API documentation</a></p>
+    </div>
+
+    <script>
+        // Get the form and output areas from the page.
+        const form = document.getElementById("uploadForm");
+        const fileInput = document.getElementById("fileInput");
+        const uploadButton = document.getElementById("uploadButton");
+        const message = document.getElementById("message");
+        const fileInfo = document.getElementById("fileInfo");
+        const measurements = document.getElementById("measurements");
+
+        // Run this function when the user clicks Upload and Measure.
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault(); // Do not reload the page.
+
+            const selectedFile = fileInput.files[0];
+            if (!selectedFile) return;
+
+            // Clear the previous result.
+            fileInfo.textContent = "Loading...";
+            measurements.textContent = "Loading...";
+            message.textContent = "Processing your file...";
+            message.className = "";
+            uploadButton.disabled = true;
+
+            // The FastAPI upload endpoint expects a form field named "file".
+            const formData = new FormData();
+            formData.append("file", selectedFile);
+
+            try {
+                // API 1: Upload the file and get its unique ID.
+                const uploadResponse = await fetch("/api/files/", {
+                    method: "POST",
+                    body: formData
+                });
+                const uploaded = await uploadResponse.json();
+
+                if (!uploadResponse.ok) {
+                    throw new Error(uploaded.detail || "Upload failed");
+                }
+
+                const fileId = uploaded.id;
+
+                // API 2: Get file information using that ID.
+                const infoResponse = await fetch("/api/files/" + fileId + "/");
+                const info = await infoResponse.json();
+
+                // API 3: Get feature measurements using the same ID.
+                const measurementResponse = await fetch("/api/files/" + fileId + "/measurements/");
+                const result = await measurementResponse.json();
+
+                if (!infoResponse.ok || !measurementResponse.ok) {
+                    throw new Error("Could not retrieve the results");
+                }
+
+                // Show the two API responses in separate panels.
+                fileInfo.textContent = JSON.stringify(info, null, 2);
+                measurements.textContent = JSON.stringify(result, null, 2);
+                message.textContent = "File processed successfully.";
+                message.className = "success";
+            } catch (error) {
+                fileInfo.textContent = "No file information available.";
+                measurements.textContent = "No measurements available.";
+                message.textContent = error.message;
+                message.className = "error";
+            } finally {
+                uploadButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
