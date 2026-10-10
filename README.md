@@ -174,7 +174,7 @@ curl.exe -X POST "http://127.0.0.1:8000/api/files/" -F "file=@survey.kml"
 {
   "id": "2469d80a-5dee-47ad-a932-ca4feee18828",
   "filename": "survey.kml",
-  "feature_count": 3,
+  "feature_count": 1,
   "crs": "EPSG:4326",
   "status": "COMPLETED"
 }
@@ -196,7 +196,7 @@ curl "http://127.0.0.1:8000/api/files/2469d80a-5dee-47ad-a932-ca4feee18828/"
 {
   "id": "2469d80a-5dee-47ad-a932-ca4feee18828",
   "filename": "survey.kml",
-  "feature_count": 3,
+  "feature_count": 1,
   "crs": "EPSG:4326",
   "status": "COMPLETED"
 }
@@ -219,7 +219,7 @@ The following example illustrates a three-feature KML dataset. Properties vary b
 ```json
 {
   "file_id": "2469d80a-5dee-47ad-a932-ca4feee18828",
-  "feature_count": 3,
+  "feature_count": 1,
   "measurements": [
     {
       "feature_id": 1,
@@ -241,37 +241,6 @@ The following example illustrates a three-feature KML dataset. Properties vary b
       "measurement_crs": "EPSG:32644",
       "measurement_status": "MEASURED"
     },
-    {
-      "feature_id": 2,
-      "geometry_type": "LineString",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [79.08, 21.14, 0.0],
-          [79.081, 21.141, 0.0]
-        ]
-      },
-      "crs": "EPSG:4326",
-      "properties": {"Name": "Test line"},
-      "area_m2": null,
-      "length_m": 151.83,
-      "measurement_crs": "EPSG:32644",
-      "measurement_status": "MEASURED"
-    },
-    {
-      "feature_id": 3,
-      "geometry_type": "Point",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [79.0882, 21.1458, 0.0]
-      },
-      "crs": "EPSG:4326",
-      "properties": {"Name": "Test point"},
-      "area_m2": null,
-      "length_m": null,
-      "measurement_crs": null,
-      "measurement_status": "NOT_REQUIRED"
-    }
   ]
 }
 ```
