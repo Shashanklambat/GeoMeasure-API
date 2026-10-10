@@ -6,8 +6,8 @@ The project implements the three required REST API endpoints. It also includes a
 
 ## Live Demo
 
-**Website:** [Try GeoMeasure API](https://geomeasure-api-w75x.onrender.com/)
-**API Docs:** [Swagger UI](https://geomeasure-api-w75x.onrender.com/docs)
+**Website:** https://geomeasure-api-w75x.onrender.com/ <br>
+**API Docs:** https://geomeasure-api-w75x.onrender.com/docs
 
 A simple web interface was additionally deployed to make API
 testing easier without manually sending requests.
