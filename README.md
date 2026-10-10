@@ -4,6 +4,14 @@ A lightweight **FastAPI** application that accepts geospatial files, extracts th
 
 The project implements the three required REST API endpoints. It also includes a small, optional web interface for uploading a file and viewing its information and measurements in separate panels.
 
+## Live Demo
+
+**Website:** [Try GeoMeasure API](https://geomeasure-api-w75x.onrender.com/)
+**API Docs:** [Swagger UI](https://geomeasure-api-w75x.onrender.com/docs)
+
+A simple web interface was additionally deployed to make API
+testing easier without manually sending requests.
+
 ## Features
 
 - Upload **KML (`.kml`)** or **Shapefile ZIP (`.zip`)** files.
